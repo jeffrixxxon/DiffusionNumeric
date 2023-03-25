@@ -8,9 +8,13 @@ class NotificationError(Exception):
     pass
 
 
-def conv_xlsx_to_csv(name_file_xlsx_1: str, name_file_xlsx_2) -> typing.NoReturn:
-    dfs_1 = pd.read_excel(f"files/{name_file_xlsx_1}.xlsx", usecols=['Ном. номер'])
-    dfs_2 = pd.read_excel(f"files/{name_file_xlsx_2}.xlsx", usecols=['Ном. номер'])
+def conv_xlsx_to_csv(name_file_xlsx_1: str, name_file_xlsx_2, cols_search) -> typing.NoReturn:
+    try:
+        dfs_1 = pd.read_excel(f"files/{name_file_xlsx_1}.xlsx", usecols=[cols_search])
+        dfs_2 = pd.read_excel(f"files/{name_file_xlsx_2}.xlsx", usecols=[cols_search])
+    except NotificationError as err:
+        print("[-]Столбец не найден!")
+        raise err
     dfs_1.to_csv(f'files/{name_file_xlsx_1}.csv')
     dfs_2.to_csv(f'files/{name_file_xlsx_2}.csv')
 
@@ -37,7 +41,8 @@ def main():
     try:
         file_xlsx_1 = input('[+]Введите имя файла из TS №1: ')
         file_xlsx_2 = input('[+]Введите имя отслеживаемого файла №2: ')
-        conv_xlsx_to_csv(file_xlsx_1, file_xlsx_2)
+        cols = input('[+]Введите название столбца для поиска для поиска: ')
+        conv_xlsx_to_csv(file_xlsx_1, file_xlsx_2, cols)
     except FileNotFoundError:
         print('[-]Введенный файл не найден. Попробуйте снова.')
         main()
