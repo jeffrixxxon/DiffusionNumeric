@@ -35,8 +35,8 @@ def create_result_txt(name_csv_1: str, name_csv_2: str) -> typing.NoReturn:
 
 def main():
     try:
-        file_xlsx_1 = input('[+]Введите имя файла №1: ')
-        file_xlsx_2 = input('[+]Введите имя файла №2: ')
+        file_xlsx_1 = input('[+]Введите имя файла из TS №1: ')
+        file_xlsx_2 = input('[+]Введите имя отслеживаемого файла №2: ')
         conv_xlsx_to_csv(file_xlsx_1, file_xlsx_2)
     except FileNotFoundError:
         print('[-]Введенный файл не найден. Попробуйте снова.')
