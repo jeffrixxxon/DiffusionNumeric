@@ -5,7 +5,7 @@ import time
 
 
 class NotificationError(Exception):
-    pass
+    ...
 
 
 def conv_xlsx_to_csv(name_file_xlsx_1: str, name_file_xlsx_2: str, cols_search: str) -> typing.NoReturn:
