@@ -8,7 +8,7 @@ class NotificationError(Exception):
     pass
 
 
-def conv_xlsx_to_csv(name_file_xlsx_1: str, name_file_xlsx_2, cols_search) -> typing.NoReturn:
+def conv_xlsx_to_csv(name_file_xlsx_1: str, name_file_xlsx_2: str, cols_search: str) -> typing.NoReturn:
     try:
         dfs_1 = pd.read_excel(f"files/{name_file_xlsx_1}.xlsx", usecols=[cols_search])
         dfs_2 = pd.read_excel(f"files/{name_file_xlsx_2}.xlsx", usecols=[cols_search])
