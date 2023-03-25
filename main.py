@@ -34,7 +34,7 @@ def create_result_txt(name_csv_1: str, name_csv_2: str) -> typing.NoReturn:
         os.remove(f'files/{name_csv_1}.csv')
         os.remove(f'files/{name_csv_2}.csv')
     except FileNotFoundError:
-        pass
+        pass #TOODO
 
 
 def main():
