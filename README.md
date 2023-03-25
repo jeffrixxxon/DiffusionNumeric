@@ -3,18 +3,30 @@
 ## Процесс установки 
 
 ### В терминале введите:
+<div>
 
-> git clone https://github.com/jeffrixxxon/DiffusionNumeric.git
+    git clone https://github.com/jeffrixxxon/DiffusionNumeric.git
+    
+</div>
+<div>
 
-> cd .\DiffusionNumeric\
+    cd .\DiffusionNumeric\
 
-> pip install -r .\requirements.tx
+</div>
+<div>
+
+    pip install -r .\requirements.tx
+
+</div>
 
 ### В папку "files" внесите 2 файла в которых требуется поиск файлов.
 
 ### Запуск: 
+<div>
 
-> python main.py
+    python main.py
+
+</div>
 
 ### В терминале введите названия файлов и столбец поиска.
 
