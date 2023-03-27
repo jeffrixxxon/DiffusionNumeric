@@ -8,11 +8,19 @@ class NotificationError(Exception):
     pass
 
 
-def conv_xlsx_to_csv(name_file_xlsx_1: str, name_file_xlsx_2) -> typing.NoReturn:
-    dfs_1 = pd.read_excel(f"files/{name_file_xlsx_1}.xlsx", usecols=['Ном. номер'])
-    dfs_2 = pd.read_excel(f"files/{name_file_xlsx_2}.xlsx", usecols=['Ном. номер'])
-    dfs_1.to_csv(f'files/{name_file_xlsx_1}.csv')
-    dfs_2.to_csv(f'files/{name_file_xlsx_2}.csv')
+def conv_xlsx_to_csv(name_file_xlsx_1: str, name_file_xlsx_2, colum: str) -> typing.NoReturn:
+    try:
+        dfs_1 = pd.read_excel(f"files/{name_file_xlsx_1}.xlsx", usecols=[colum], engine="openpyxl")
+        dfs_2 = pd.read_excel(f"files/{name_file_xlsx_2}.xlsx", usecols=[colum], engine="openpyxl")
+    except ValueError:
+        print('[-]ValueError: Введеная колонка не найдена. Попробуйте снова!')
+        main()
+    except FileNotFoundError:
+        print('[-]FileNotFoundError: Один из файлов не был найден. Попробуйте снова!')
+        main()
+    else:
+        dfs_1.to_csv(f'files/{name_file_xlsx_1}.csv')
+        dfs_2.to_csv(f'files/{name_file_xlsx_2}.csv')
 
 
 def numeric_number(name_file_csv: str) -> set:
@@ -30,27 +38,29 @@ def create_result_txt(name_csv_1: str, name_csv_2: str) -> typing.NoReturn:
         os.remove(f'files/{name_csv_1}.csv')
         os.remove(f'files/{name_csv_2}.csv')
     except FileNotFoundError:
-        pass
+        print('[INFO] Файлы .csv не найдены.')
 
 
 def main():
     try:
         file_xlsx_1 = input('[+]Введите имя файла из TS №1: ')
         file_xlsx_2 = input('[+]Введите имя отслеживаемого файла №2: ')
-        conv_xlsx_to_csv(file_xlsx_1, file_xlsx_2)
-    except FileNotFoundError:
-        print('[-]Введенный файл не найден. Попробуйте снова.')
-        main()
+        search_colum = input('[+]Введите название колонки: ')
+        conv_xlsx_to_csv(file_xlsx_1, file_xlsx_2, search_colum)
+        create_result_txt(file_xlsx_1, file_xlsx_2)
+    except KeyboardInterrupt:
+        print('\n[INFO]Выполнение программы остановлено пользователем.')
 
-    create_result_txt(file_xlsx_1, file_xlsx_2)
-
-    print('[+]Success')
+    print('[INFO]Success!')
 
     print('[+]Очистить папку /files?: [Y/N]')
     request = input()
-    if request.upper() == 'Y':
-        os.remove(f'files/{file_xlsx_1}.xlsx')
-        os.remove(f'files/{file_xlsx_2}.xlsx')
+    try:
+        if request.upper() == 'Y':
+            os.remove(f'files/{file_xlsx_1}.xlsx')
+            os.remove(f'files/{file_xlsx_2}.xlsx')
+    except FileNotFoundError:
+        pass
 
 
 if __name__ == '__main__':
