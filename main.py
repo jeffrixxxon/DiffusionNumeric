@@ -1,72 +1,56 @@
-import os
-import typing
-import pandas as pd
-import time
+from customtkinter import *
+from tkinter import filedialog as fd
+from difference import Difference
 
 
-class NotificationError(Exception):
-    pass
+class App(CTk):
+    def __init__(self):
+        super().__init__()
+        self.geometry('640x480')
+        self.title('Mvideo TDF')
+        set_appearance_mode('system')
+        self.entry_ts = CTkEntry(self, placeholder_text='Путь к файлу  TS', width=400)
+        self.entry_ts.grid(row=0, column=1, padx=10, pady=10, sticky=NSEW)
+        self.button_ts = CTkButton(self, text='Открыть', command=self.ts_file_name)
+        self.button_ts.grid(row=0, column=2, padx=10, pady=10, sticky=NSEW)
+        self.entry_fact = CTkEntry(self, placeholder_text='Путь к фактическому файлу')
+        self.entry_fact.grid(row=2, column=1, padx=10, pady=10, sticky=NSEW)
+        self.button_fact = CTkButton(self, text='Открыть', command=self.fact_file_name)
+        self.button_fact.grid(row=2, column=2, padx=10, pady=10, sticky=NSEW)
+        self.name_colum = CTkEntry(self, placeholder_text='Название колонки')
+        self.name_colum.grid(row=3, column=1, padx=10, pady=10, sticky=NSEW)
 
+    def ts_file_name(self):
+        filepath_ts = fd.askopenfilename()
+        if filepath_ts != '' and filepath_ts.split('.')[-1] == 'xlsx':
+            with open(filepath_ts, 'r') as file:
+                text = file.name
+                self.entry_ts.delete(0, END)
+                self.entry_ts.insert(0, text)
+        else:
+            self.entry_ts.delete(0, END)
+            self.entry_ts.insert(0, 'Неверный формат файла.')
 
-def conv_xlsx_to_csv(name_file_xlsx_1: str, name_file_xlsx_2, colum: str) -> typing.NoReturn:
-    try:
-        dfs_1 = pd.read_excel(f"files/{name_file_xlsx_1}.xlsx", usecols=[colum], engine="openpyxl")
-        dfs_2 = pd.read_excel(f"files/{name_file_xlsx_2}.xlsx", usecols=[colum], engine="openpyxl")
-    except ValueError:
-        print('[-]ValueError: Введеная колонка не найдена. Попробуйте снова!')
-        main()
-    except FileNotFoundError:
-        print('[-]FileNotFoundError: Один из файлов не был найден. Попробуйте снова!')
-        main()
-    else:
-        dfs_1.to_csv(f'files/{name_file_xlsx_1}.csv')
-        dfs_2.to_csv(f'files/{name_file_xlsx_2}.csv')
-
-
-def numeric_number(name_file_csv: str) -> set:
-    result = []
-    with open(f'files/{name_file_csv}.csv', encoding='utf-8') as file:
-        for line in file.readlines():
-            result.append(line.split(',')[1].lstrip('.'))
-    return set(map(lambda x: f"{x.split('.')[0]}\n", result[1:]))
-
-
-def create_result_txt(name_csv_1: str, name_csv_2: str) -> typing.NoReturn:
-    with open('files/result.txt', 'w', encoding='utf-8') as file:
-        file.writelines(numeric_number(name_csv_1).difference(numeric_number(name_csv_2)))
-    try:
-        os.remove(f'files/{name_csv_1}.csv')
-        os.remove(f'files/{name_csv_2}.csv')
-    except FileNotFoundError:
-        print('[INFO] Файлы .csv не найдены.')
+    def fact_file_name(self):
+        filepath_fact = fd.askopenfilename()
+        if filepath_fact != '' and filepath_fact.split('.')[-1] == 'xlsx':
+            with open(filepath_fact, 'r') as file:
+                text = file.name
+                self.entry_fact.delete(0, END)
+                self.entry_fact.insert(0, text)
+        else:
+            self.entry_ts.delete(0, END)
+            self.entry_ts.insert(0, 'Неверный формат файла.')
 
 
 def main():
-    try:
-        file_xlsx_1 = input('[+]Введите имя файла из TS №1: ')
-        file_xlsx_2 = input('[+]Введите имя отслеживаемого файла №2: ')
-        search_colum = input('[+]Введите название колонки: ')
-        conv_xlsx_to_csv(file_xlsx_1, file_xlsx_2, search_colum)
-        create_result_txt(file_xlsx_1, file_xlsx_2)
-    except KeyboardInterrupt:
-        print('\n[INFO]Выполнение программы остановлено пользователем.')
-
-    print('[INFO]Success!')
-
-    print('[+]Очистить папку /files?: [Y/N]')
-    request = input()
-    try:
-        if request.upper() == 'Y':
-            os.remove(f'files/{file_xlsx_1}.xlsx')
-            os.remove(f'files/{file_xlsx_2}.xlsx')
-    except FileNotFoundError:
-        pass
+    root = App()
+    root.mainloop()
 
 
 if __name__ == '__main__':
-    start = time.perf_counter()
     main()
-    print(time.perf_counter() - start)
+
 
 
 
