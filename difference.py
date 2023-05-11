@@ -36,11 +36,3 @@ class Difference:
         except ValueError as err:
             return err.__class__
 
-
-if __name__ == '__main__':
-    path_2 = '/Users/daniil/Downloads/Сроки годности.xlsx'
-    path_1 = '/Users/daniil/Downloads/trade.xlsx'
-    if os.path.exists(path_1) and os.path.exists(path_2):
-        diff = Difference(path_1, path_2)
-        print(diff.get_list_columns())
-
