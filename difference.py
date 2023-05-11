@@ -4,28 +4,37 @@ import pandas as pd
 
 class Difference:
     def __init__(self, path_ts: str, path_fact: str):
-        self.new_frame: pd.DataFrame = pd.DataFrame()
         self.data_frame_ts: pd.DataFrame = pd.DataFrame()
         self.data_frame_fact: pd.DataFrame = pd.DataFrame()
         self.ts: str = path_ts
         self.fact: str = path_fact
 
     def get_list_columns(self) -> list:
-        self.data_frame_ts = pd.read_excel(self.ts)
-        self.data_frame_fact = pd.read_excel(self.fact)
-        return self.data_frame_ts.columns.tolist()
+        try:
+            self.data_frame_ts = pd.read_excel(self.ts)
+            self.data_frame_fact = pd.read_excel(self.fact)
+            return self.data_frame_ts.columns.tolist()
+        except Exception as err:
+            return err.__class__
 
     def find_difference_numeric(self, name_column: str) -> list:
-        _trade: list = self.data_frame_ts[name_column].tolist()
-        _fact: list = self.data_frame_fact[name_column].tolist()
-        _result_difference_num: set = set(_trade).difference(set(_fact))
-        return list(map(str, _result_difference_num))
+        try:
+            _trade: pd.DataFrame = self.data_frame_ts[name_column].dropna(how='all')
+            _fact: pd.DataFrame = self.data_frame_fact[name_column].dropna(how='all')
+            _result_difference_num: set = set(_trade.tolist()
+                                              ).difference(set(_fact.tolist()))
+            return list(map(str, _result_difference_num))
+        except KeyError:
+            return False
 
     def column_is_correct(self):
-        if self.data_frame_fact and self.data_frame_ts:
-            _correct_ts = self.data_frame_ts.columns.tolist()
-            _correct_fact = self.data_frame_fact.columns.tolist()
-            return set(_correct_ts).difference_update(_correct_fact)
+        try:
+            _correct_ts: list = self.data_frame_ts.columns.tolist()
+            _correct_fact: list = self.data_frame_fact.columns.tolist()
+            _difference_ts_in_fact: set = set(_correct_ts).difference(_correct_fact)
+            return _difference_ts_in_fact
+        except ValueError as err:
+            return err.__class__
 
 
 if __name__ == '__main__':
