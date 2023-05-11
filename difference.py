@@ -4,9 +4,9 @@ import pandas as pd
 
 class Difference:
     def __init__(self, path_ts: str, path_fact: str):
-        self.new_frame = pd.DataFrame(dtype='Int64')
-        self.data_frame_ts = pd.DataFrame(dtype='Int64')
-        self.data_frame_fact = pd.DataFrame(dtype='Int64')
+        self.new_frame: pd.DataFrame = pd.DataFrame()
+        self.data_frame_ts: pd.DataFrame = pd.DataFrame()
+        self.data_frame_fact: pd.DataFrame = pd.DataFrame()
         self.ts: str = path_ts
         self.fact: str = path_fact
 
@@ -16,10 +16,16 @@ class Difference:
         return self.data_frame_ts.columns.tolist()
 
     def find_difference_numeric(self, name_column: str) -> list:
-        _trade = self.data_frame_ts[name_column].tolist()
-        _fact = self.data_frame_fact[name_column].tolist()
-        _result_difference_num = set(_trade).difference(set(_fact))
+        _trade: list = self.data_frame_ts[name_column].tolist()
+        _fact: list = self.data_frame_fact[name_column].tolist()
+        _result_difference_num: set = set(_trade).difference(set(_fact))
         return list(map(str, _result_difference_num))
+
+    def column_is_correct(self):
+        if self.data_frame_fact and self.data_frame_ts:
+            _correct_ts = self.data_frame_ts.columns.tolist()
+            _correct_fact = self.data_frame_fact.columns.tolist()
+            return set(_correct_ts).difference_update(_correct_fact)
 
 
 if __name__ == '__main__':

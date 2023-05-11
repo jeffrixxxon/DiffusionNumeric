@@ -9,6 +9,11 @@ class App(CTk):
         self.geometry('640x480')
         self.title('Mvideo TDF')
         set_appearance_mode('system')
+
+
+class Interface(App):
+    def __init__(self):
+        super().__init__()
         self.filepath_ts = None
         self.filepath_fact = None
         self.name_colum = None
@@ -31,14 +36,16 @@ class App(CTk):
         self.start_button = CTkButton(self, height=45, text='Запустить', state='disabled', command=self._button_processing)
         self.start_button.grid(row=4, column=1, padx=10, pady=10, sticky=NSEW)
         # лейбл состояния
-        self.label_validation = CTkLabel(self, text='Укажите путь к файлу из системы учета')
-        self.label_validation.grid(row=5, column=1, padx=5, pady=5, sticky=NSEW)
+        self.label_frame = CTkFrame(self, width=300, height=100)
+        self.label_frame.grid(row=5, column=1, padx=10, pady=10)
+        self.label_validation = CTkLabel(self.label_frame, text='Укажите путь к файлу из системы учета')
+        self.label_validation.grid(row=5, column=1, padx=10, pady=10, sticky=NSEW)
 
     def _path_to_file(self, field):
-        file_path = fd.askopenfilename()
-        if file_path != '' and file_path.split('.')[-1] == 'xlsx':
+        _file_path = fd.askopenfilename()
+        if _file_path != '' and _file_path.split('.')[-1] == 'xlsx':
 
-            with open(file_path, 'r') as file:
+            with open(_file_path, 'r') as file:
                 path = file.name
                 field.delete(0, END)
                 field.insert(0, path)
@@ -67,13 +74,14 @@ class App(CTk):
             self.label_validation.configure(text=_result_diff)
 
     def _columns_validation(self):
+        _is_correct_options = self.diff.column_is_correct()
         self.name_colum = self.names_colum.get()
         self.label_validation.configure(text=f'Колонка {self.name_colum} успешно выбрана\nНажмите кнопку "Запустить"')
         self.start_button.configure(state='enabled')
 
 
 def main():
-    root = App()
+    root: Interface = Interface()
     root.mainloop()
 
 
