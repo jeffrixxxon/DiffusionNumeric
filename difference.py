@@ -40,7 +40,7 @@ class Difference:
         except KeyError as err:
             return False
         else:
-            return map(str, _result_difference_num)
+            return ''.join(map(lambda x: f'{x}\n', _result_difference_num))
 
     def column_is_correct(self):
         try:
