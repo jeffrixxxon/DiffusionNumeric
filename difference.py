@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 
 
@@ -6,26 +5,42 @@ class Difference:
     def __init__(self, path_ts: str, path_fact: str):
         self.data_frame_ts: pd.DataFrame = pd.DataFrame()
         self.data_frame_fact: pd.DataFrame = pd.DataFrame()
-        self.ts: str = path_ts
-        self.fact: str = path_fact
+        self.path_ts: str = path_ts
+        self.path_fact: str = path_fact
 
-    def get_list_columns(self) -> list:
+    @classmethod
+    def is_number_array(cls, array: pd.DataFrame):
+        _array = map(lambda val: isinstance(val, float), array.tolist())
+        if all(_array):
+            return True
+        return False
+
+    def get_list_columns(self) -> list | str:
         try:
-            self.data_frame_ts = pd.read_excel(self.ts)
-            self.data_frame_fact = pd.read_excel(self.fact)
+            self.data_frame_ts: pd.DataFrame = pd.read_excel(self.path_ts)
+        except (AttributeError, KeyError):
+            return 'TradeError'
+        try:
+            self.data_frame_fact: pd.DataFrame = pd.read_excel(self.path_fact)
+        except (AttributeError, KeyError):
+            return 'FactFileError'
+        else:
             return self.data_frame_ts.columns.tolist()
-        except Exception as err:
-            return err.__class__
 
-    def find_difference_numeric(self, name_column: str) -> list:
+    def find_difference_numeric(self, name_column: str) -> list | bool:
         try:
-            _trade: pd.DataFrame = self.data_frame_ts[name_column].dropna(how='all')
-            _fact: pd.DataFrame = self.data_frame_fact[name_column].dropna(how='all')
-            _result_difference_num: set = set(_trade.tolist()
-                                              ).difference(set(_fact.tolist()))
-            return list(map(str, _result_difference_num))
-        except KeyError:
+            _select_ts_col: pd.Series = self.data_frame_ts[name_column].dropna(how='all')
+            _select_fact_col: pd.Series = self.data_frame_fact[name_column].dropna(how='all')
+            if self.is_number_array(_select_ts_col) and self.is_number_array(_select_fact_col):
+                _result_difference_num: set = set(_select_ts_col.astype(dtype='int64').tolist()
+                                                  ).difference(set(_select_fact_col.astype(dtype='int64').tolist()))
+            else:
+                _result_difference_num: set = set(_select_ts_col.tolist()
+                                                 ).difference(set(_select_fact_col.tolist()))
+        except KeyError as err:
             return False
+        else:
+            return map(str, _result_difference_num)
 
     def column_is_correct(self):
         try:
@@ -34,5 +49,5 @@ class Difference:
             _difference_ts_in_fact: set = set(_correct_ts).difference(_correct_fact)
             return _difference_ts_in_fact
         except ValueError as err:
-            return err.__class__
+            return err.with_traceback()
 
