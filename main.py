@@ -22,7 +22,7 @@ class App(CTk):
             _info_label.pack(side=TOP)
 
         super().__init__()
-        self.geometry('640x420')
+        self.geometry('640x430')
         self.resizable(width=False, height=False)
         self.title('Mvideo TDF')
         set_appearance_mode('system')
@@ -103,13 +103,14 @@ class Interface(App):
         self.save_frame = CTkFrame(self, width=140, height=200)
         self.save_frame.grid(row=5, column=2)
 
-        self.appearance_mode = CTkSwitch(self.save_frame,
+        self.appearance_mode = CTkSwitch(self,
                                          text='Light',
                                          command=self._switch_appearance_mode,
                                          variable=self.app_mode_status,
-                                         onvalue="dark", offvalue="light"
+                                         onvalue="dark", offvalue="light",
+                                         font=('Courier New', 13)
                                          )
-
+        self.appearance_mode.grid(row=6, column=1, padx=10, pady=5, sticky='w')
         self.label_format_save = CTkLabel(self.save_frame, text='Формат сохранения')
         self.label_format_save.pack(side=TOP, padx=10)
 
@@ -174,8 +175,9 @@ class Interface(App):
             field.insert(0, 'Неверный формат файла')
 
     def _save_us(self):
-        with fd.asksaveasfilename(defaultextension=".txt", ) as _new_file:
-            pass # TODO
+        with fd.asksaveasfile(title='Сохранить как', defaultextension=".txt") as new_file:
+            if new_file:
+                new_file.writelines(self.result_diff)
 
     def _button_processing(self):
         if self.filepath_ts and not self.filepath_fact:
@@ -188,8 +190,7 @@ class Interface(App):
             self.result_diff: list | bool = self.diff.find_difference_numeric(name_column=self.name_colum)
             if self.result_diff:
                 self.result_win.delete(0.0, END)
-                for val in self.result_diff:
-                    self.result_win.insert(0.0, f'{val}\n')
+                self.result_win.insert(0.0, self.result_diff)
                 self.save_us.configure(state='enabled')
                 self.label_validation.configure(text='Успешно', text_color='green')
             else:
