@@ -9,7 +9,7 @@ class Difference:
         self.path_fact: str = path_fact
 
     @classmethod
-    def is_number_array(cls, array: pd.DataFrame):
+    def is_number_array(cls, array: pd.Series):
         _array = map(lambda val: isinstance(val, float), array.tolist())
         if all(_array):
             return True
@@ -24,10 +24,9 @@ class Difference:
             self.data_frame_fact: pd.DataFrame = pd.read_excel(self.path_fact)
         except (AttributeError, KeyError):
             return 'FactFileError'
-        else:
-            return self.data_frame_ts.columns.tolist()
+        return self.data_frame_ts.columns.tolist()
 
-    def find_difference_numeric(self, name_column: str) -> list | bool:
+    def find_difference_numeric(self, name_column: str) -> bool | str:
         try:
             _select_ts_col: pd.Series = self.data_frame_ts[name_column].dropna(how='all')
             _select_fact_col: pd.Series = self.data_frame_fact[name_column].dropna(how='all')

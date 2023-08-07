@@ -1,6 +1,6 @@
 import sentry_sdk
 from customtkinter import *
-from tkinter import filedialog as fd, Menu
+from tkinter import filedialog as fd, Menu, messagebox
 from difference import Difference
 
 sentry_sdk.init(
@@ -12,30 +12,29 @@ sentry_sdk.init(
 class App(CTk):
     def __init__(self):
         def _help_info() -> None:
-            __alert_info: CTkToplevel = CTkToplevel(self)
-            __alert_info.geometry('200x50')
-            __alert_info.title('О приложении')
-            __alert_info.resizable(width=False, height=False)
-            _info_label: CTkLabel = CTkLabel(__alert_info,
-                                             text='Version 1.0\n by @jeffrixxxon'
-                                            )
-            _info_label.pack(side=TOP)
+            __msg = 'Version 0.2\nBy @jeffrixxxon'
+            messagebox.showinfo('About', message=__msg)
 
         super().__init__()
         self.geometry('640x430')
         self.resizable(width=False, height=False)
-        self.title('Mvideo TDF')
-        set_appearance_mode('system')
+        self.title('TDF')
+        self.iconbitmap('icon.ico')
+        set_appearance_mode('light')
 
-        # Меню приложения
-        self.main_menu: Menu = Menu(self)
-        self.config(menu=self.main_menu)
-        self.file_menu: Menu = Menu(self.main_menu)
-        self.file_menu.add_command(label='Выход', command=self.destroy)
-        self.main_menu.add_cascade(label='Файл', menu=self.file_menu)
-        self.help_menu: Menu = Menu(self.main_menu)
-        self.help_menu.add_command(label='О приложении', command=_help_info)
-        self.main_menu.add_cascade(label='Справка', menu=self.help_menu)
+        # Create a menu bar
+        self.menu_bar = Menu(self)
+        self.config(menu=self.menu_bar)
+
+        # Create a file menu
+        self.file_menu = Menu(self.menu_bar, tearoff=0)
+        self.file_menu.add_command(label="Exit", command=self.quit)
+        self.menu_bar.add_cascade(label="File", menu=self.file_menu)
+
+        # Create a help menu
+        self.help_menu = Menu(self.menu_bar, tearoff=0)
+        self.help_menu.add_command(label="About", command=_help_info)
+        self.menu_bar.add_cascade(label="Help", menu=self.help_menu)
 
 
 class Interface(App):
@@ -98,50 +97,6 @@ class Interface(App):
         self.result_win: CTkTextbox = CTkTextbox(self, width=450, height=200, border_width=2)
         self.result_win.grid(row=5, column=1, padx=10, pady=2, sticky=NSEW)
 
-        self.app_mode_status = StringVar(value=get_appearance_mode())
-
-        self.save_frame = CTkFrame(self, width=140, height=200)
-        self.save_frame.grid(row=5, column=2)
-
-        self.appearance_mode = CTkSwitch(self,
-                                         text='Light',
-                                         command=self._switch_appearance_mode,
-                                         variable=self.app_mode_status,
-                                         onvalue="dark", offvalue="light",
-                                         font=('Courier New', 13)
-                                         )
-        self.appearance_mode.grid(row=6, column=1, padx=10, pady=5, sticky='w')
-        self.label_format_save = CTkLabel(self.save_frame, text='Формат сохранения')
-        self.label_format_save.pack(side=TOP, padx=10)
-
-        self.save_file_format = IntVar(value=0)
-        self.radio_btn_txt = CTkRadioButton(self.save_frame,
-                                            text='TXT',
-                                            variable=self.save_file_format,
-                                            value=1)
-        self.radio_btn_txt.pack(side=TOP, padx=10, pady=10)
-        self.radio_btn_xlsx = CTkRadioButton(self.save_frame,
-                                             text='XLSX',
-                                             variable=self.save_file_format,
-                                             value=2)
-        self.radio_btn_xlsx.pack(side=TOP, padx=10, pady=10)
-        self.save_us: CTkButton = CTkButton(self.save_frame,
-                                            text='Сохранить как',
-                                            width=140, height=40,
-                                            state='disabled',
-                                            command=self._save_us
-                                            )
-        self.save_us.pack(side=BOTTOM, padx=10, pady=10)
-
-    def _switch_appearance_mode(self):
-        __mode = self.app_mode_status.get().lower()
-        if __mode == 'light':
-            self.appearance_mode.configure(text='Dark')
-            set_appearance_mode(__mode)
-        if __mode == 'dark':
-            self.appearance_mode.configure(text='Light')
-            set_appearance_mode(__mode)
-
     def _path_to_file(self, field):
         _file_path: fd = fd.askopenfilename() # TODO
         if _file_path != '' and _file_path.split('.')[-1] == 'xlsx':
@@ -191,7 +146,6 @@ class Interface(App):
             if self.result_diff:
                 self.result_win.delete(0.0, END)
                 self.result_win.insert(0.0, self.result_diff)
-                self.save_us.configure(state='enabled')
                 self.label_validation.configure(text='Успешно', text_color='green')
             else:
                 self.label_validation.configure(text=f'Колонка "{self.name_colum}" отсутствует в фактическом файле',
